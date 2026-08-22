@@ -442,3 +442,76 @@ def test_api_upload_success_preserves_physical_file(client: TestClient):
     del_res = client.delete(f"/api/v1/datasets/{dataset_id}")
     assert del_res.status_code == 200
 
+
+def test_api_category_and_region_filters_breakdown(client: TestClient):
+    """Test 30: Verify category and regional breakdown endpoints respect no filters, category-only, region-only, and both filters."""
+    csv_data = """order_date,order_id,product_name,category,region,total_revenue,total_cost,profit
+2024-01-10,ORD-1,Laptop,Electronics,North,2000.0,1200.0,800.0
+2024-01-15,ORD-2,Phone,Electronics,South,1000.0,600.0,400.0
+2024-02-10,ORD-3,Desk,Furniture,North,500.0,300.0,200.0
+2024-02-15,ORD-4,Chair,Furniture,South,150.0,80.0,70.0
+"""
+    files = {"file": ("filter_breakdown_test.csv", create_csv_bytes(csv_data), "text/csv")}
+    upload_res = client.post("/api/v1/upload", files=files)
+    dataset_id = upload_res.json()["dataset_id"]
+
+    # 1. No filters:
+    # Categories: Electronics ($3000) and Furniture ($650)
+    # Regions: North ($2500) and South ($1150)
+    cat_all = client.get(f"/api/v1/analytics/{dataset_id}/categories").json()
+    assert cat_all["available"] is True
+    assert len(cat_all["categories"]) == 2
+    assert [c["category"] for c in cat_all["categories"]] == ["Electronics", "Furniture"]
+
+    reg_all = client.get(f"/api/v1/analytics/{dataset_id}/regions").json()
+    assert reg_all["available"] is True
+    assert len(reg_all["regions"]) == 2
+    assert [r["region"] for r in reg_all["regions"]] == ["North", "South"]
+
+    # 2. Category only: Category = Furniture
+    # Categories: only Furniture ($650, 100%)
+    # Regions: North ($500) and South ($150)
+    cat_furn = client.get(f"/api/v1/analytics/{dataset_id}/categories?category=Furniture").json()
+    assert len(cat_furn["categories"]) == 1
+    assert cat_furn["categories"][0]["category"] == "Furniture"
+    assert cat_furn["categories"][0]["revenue"] == 650.0
+
+    reg_furn = client.get(f"/api/v1/analytics/{dataset_id}/regions?category=Furniture").json()
+    assert len(reg_furn["regions"]) == 2
+    assert reg_furn["regions"][0]["region"] == "North"
+    assert reg_furn["regions"][0]["revenue"] == 500.0
+    assert reg_furn["regions"][1]["region"] == "South"
+    assert reg_furn["regions"][1]["revenue"] == 150.0
+
+    # 3. Region only: Region = South
+    # Categories: Electronics ($1000) and Furniture ($150)
+    # Regions: only South ($1150, 100%)
+    cat_south = client.get(f"/api/v1/analytics/{dataset_id}/categories?region=South").json()
+    assert len(cat_south["categories"]) == 2
+    assert cat_south["categories"][0]["category"] == "Electronics"
+    assert cat_south["categories"][0]["revenue"] == 1000.0
+    assert cat_south["categories"][1]["category"] == "Furniture"
+    assert cat_south["categories"][1]["revenue"] == 150.0
+
+    reg_south = client.get(f"/api/v1/analytics/{dataset_id}/regions?region=South").json()
+    assert len(reg_south["regions"]) == 1
+    assert reg_south["regions"][0]["region"] == "South"
+    assert reg_south["regions"][0]["revenue"] == 1150.0
+
+    # 4. Category + Region: Category = Furniture & Region = North
+    # Categories: only Furniture ($500, 100%)
+    # Regions: only North ($500, 100%)
+    cat_both = client.get(f"/api/v1/analytics/{dataset_id}/categories?category=Furniture&region=North").json()
+    assert len(cat_both["categories"]) == 1
+    assert cat_both["categories"][0]["category"] == "Furniture"
+    assert cat_both["categories"][0]["revenue"] == 500.0
+
+    reg_both = client.get(f"/api/v1/analytics/{dataset_id}/regions?category=Furniture&region=North").json()
+    assert len(reg_both["regions"]) == 1
+    assert reg_both["regions"][0]["region"] == "North"
+    assert reg_both["regions"][0]["revenue"] == 500.0
+
+    # Cleanup
+    client.delete(f"/api/v1/datasets/{dataset_id}")
+
+

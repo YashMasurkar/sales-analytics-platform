@@ -98,6 +98,7 @@ export const API = {
         const params = new URLSearchParams();
         if (filters.startDate) params.append('start_date', filters.startDate);
         if (filters.endDate) params.append('end_date', filters.endDate);
+        if (filters.category) params.append('category', filters.category);
         if (filters.region) params.append('region', filters.region);
         const queryStr = params.toString() ? `?${params.toString()}` : '';
         return await request(`/analytics/${encodeURIComponent(id)}/categories${queryStr}`);
@@ -108,9 +109,11 @@ export const API = {
         if (filters.startDate) params.append('start_date', filters.startDate);
         if (filters.endDate) params.append('end_date', filters.endDate);
         if (filters.category) params.append('category', filters.category);
+        if (filters.region) params.append('region', filters.region);
         const queryStr = params.toString() ? `?${params.toString()}` : '';
         return await request(`/analytics/${encodeURIComponent(id)}/regions${queryStr}`);
     },
+
 
     async getProducts(id, filters = {}) {
         const params = new URLSearchParams();

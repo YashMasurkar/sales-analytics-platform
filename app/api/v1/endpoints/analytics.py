@@ -188,11 +188,12 @@ def get_categories(
     id: str,
     start_date: Optional[str] = Query(None, description="Filter start date (YYYY-MM-DD)"),
     end_date: Optional[str] = Query(None, description="Filter end date (YYYY-MM-DD)"),
+    category: Optional[str] = Query(None, description="Filter by Category"),
     region: Optional[str] = Query(None, description="Filter by Region"),
     db: Session = Depends(get_db),
 ) -> CategoriesResponse:
     """Retrieve category performance breakdown."""
-    df, available_dims = query_filtered_dataframe(id, start_date, end_date, None, region, db)
+    df, available_dims = query_filtered_dataframe(id, start_date, end_date, category, region, db)
     kpis = kpi_engine.calculate(df, available_dims)
 
     if kpis.category_performance is None:
@@ -222,10 +223,11 @@ def get_regions(
     start_date: Optional[str] = Query(None, description="Filter start date (YYYY-MM-DD)"),
     end_date: Optional[str] = Query(None, description="Filter end date (YYYY-MM-DD)"),
     category: Optional[str] = Query(None, description="Filter by Category"),
+    region: Optional[str] = Query(None, description="Filter by Region"),
     db: Session = Depends(get_db),
 ) -> RegionsResponse:
     """Retrieve regional performance breakdown."""
-    df, available_dims = query_filtered_dataframe(id, start_date, end_date, category, None, db)
+    df, available_dims = query_filtered_dataframe(id, start_date, end_date, category, region, db)
     kpis = kpi_engine.calculate(df, available_dims)
 
     if kpis.regional_performance is None:
