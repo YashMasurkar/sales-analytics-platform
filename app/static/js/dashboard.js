@@ -32,6 +32,47 @@ export const Dashboard = {
             });
         }
 
+        // Remove Selected Dataset Button
+        const removeDatasetBtn = document.getElementById('dashboard-delete-dataset-btn');
+        if (removeDatasetBtn) {
+            removeDatasetBtn.addEventListener('click', () => {
+                const datasetId = State.activeDatasetId;
+                if (!datasetId) {
+                    UI.showToast('Please select a dataset to remove.', 'warning');
+                    return;
+                }
+                const currentDataset = State.datasets.find(d => d.id === datasetId) || State.activeDataset;
+                const rawFilename = currentDataset?.filename || 'the selected dataset';
+                const filename = Formatters.escapeHtml(rawFilename);
+
+                UI.confirm(
+                    'Delete Dataset',
+                    `Are you sure you want to permanently delete "${filename}"? All associated analytical records and quality logs will be removed.`,
+                    'Delete Dataset',
+                    async () => {
+                        try {
+                            await API.deleteDataset(datasetId);
+                            UI.showToast(`Dataset "${filename}" was deleted.`, 'success');
+                            await State.refreshDatasets();
+                            if (State.activeDatasetId === datasetId) {
+                                if (State.datasets.length > 0) {
+                                    await State.setActiveDataset(State.datasets[0].id);
+                                } else {
+                                    await State.setActiveDataset(null);
+                                    State.setView('upload');
+                                }
+                            }
+                        } catch (err) {
+                            console.error('Delete failed:', err);
+                            const msg = err.message || 'Failed to delete dataset.';
+                            UI.showToast(msg, 'error');
+                        }
+                    }
+                );
+            });
+        }
+
+
         // Date & Dimension Filters
         const startDateInput = document.getElementById('filter-start-date');
         const endDateInput = document.getElementById('filter-end-date');

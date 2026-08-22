@@ -13,10 +13,12 @@ import { Datasets } from './datasets.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
     // 1. Initialize Component Controllers
+    UI.init();
     Dashboard.init();
     Upload.init();
     Audit.init();
     Datasets.init();
+
 
     // 2. Setup Navigation View Switching
     setupNavigation();
@@ -116,16 +118,25 @@ function updateViewUI(viewName) {
 
 function updateDatasetSelectors(datasets) {
     const selector = document.getElementById('dataset-selector');
+    const deleteBtn = document.getElementById('dashboard-delete-dataset-btn');
     if (!selector) return;
 
     selector.innerHTML = '';
     if (datasets.length === 0) {
         selector.innerHTML = '<option value="">No datasets uploaded</option>';
         selector.disabled = true;
+        if (deleteBtn) {
+            deleteBtn.disabled = true;
+            deleteBtn.classList.add('opacity-50', 'cursor-not-allowed');
+        }
         return;
     }
 
     selector.disabled = false;
+    if (deleteBtn) {
+        deleteBtn.disabled = false;
+        deleteBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+    }
     datasets.forEach(d => {
         const opt = document.createElement('option');
         opt.value = d.id;
@@ -136,3 +147,4 @@ function updateDatasetSelectors(datasets) {
         selector.appendChild(opt);
     });
 }
+

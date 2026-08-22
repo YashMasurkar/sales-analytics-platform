@@ -6,6 +6,31 @@
 import { Formatters } from './formatters.js';
 
 export const UI = {
+    init() {
+        const cancelBtn = document.getElementById('confirm-modal-cancel-btn');
+        if (cancelBtn) {
+            cancelBtn.addEventListener('click', () => {
+                this.closeModal('confirm-modal');
+            });
+        }
+
+        const confirmModal = document.getElementById('confirm-modal');
+        if (confirmModal) {
+            confirmModal.addEventListener('click', (e) => {
+                if (e.target === confirmModal) {
+                    this.closeModal('confirm-modal');
+                }
+            });
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                this.closeModal('confirm-modal');
+                this.closeModal('audit-modal');
+            }
+        });
+    },
+
     showToast(message, type = 'info', duration = 4000) {
         const container = document.getElementById('toast-container');
         if (!container) return;
@@ -35,7 +60,6 @@ export const UI = {
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
             </button>
         `;
-
 
         const closeBtn = toast.querySelector('button');
         closeBtn.addEventListener('click', () => {
@@ -84,16 +108,20 @@ export const UI = {
         document.getElementById('confirm-modal-body').textContent = message;
         
         const confirmBtn = document.getElementById('confirm-modal-btn');
-        confirmBtn.textContent = confirmText;
-        
-        const newBtn = confirmBtn.cloneNode(true);
-        confirmBtn.parentNode.replaceChild(newBtn, confirmBtn);
-        
-        newBtn.addEventListener('click', () => {
-            UI.closeModal('confirm-modal');
-            onConfirm();
-        });
+        if (confirmBtn) {
+            confirmBtn.textContent = confirmText;
+            const newConfirmBtn = confirmBtn.cloneNode(true);
+            confirmBtn.parentNode.replaceChild(newConfirmBtn, confirmBtn);
+            newConfirmBtn.addEventListener('click', () => {
+                this.closeModal('confirm-modal');
+                if (typeof onConfirm === 'function') {
+                    onConfirm();
+                }
+            });
+        }
 
-        UI.openModal('confirm-modal');
+        this.openModal('confirm-modal');
     }
 };
+
+

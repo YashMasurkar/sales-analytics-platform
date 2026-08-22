@@ -377,7 +377,11 @@ def test_root_serves_frontend_html(client: TestClient):
     assert res.status_code == 200
     assert "Sales Analytics & Business Intelligence Platform" in res.text
     assert "Sales Overview" in res.text
+    assert "dashboard-delete-dataset-btn" in res.text
+    assert "confirm-modal-cancel-btn" in res.text
     assert "/static/js/app.js" in res.text
+
+
 
 
 def test_demo_dataset_static_asset_served(client: TestClient):
@@ -513,5 +517,48 @@ def test_api_category_and_region_filters_breakdown(client: TestClient):
 
     # Cleanup
     client.delete(f"/api/v1/datasets/{dataset_id}")
+
+
+def test_api_dataset_sequential_deletion_lifecycle(client: TestClient):
+    """Test 31: Verify sequential deletion of multiple datasets, 404 responses, and empty state transition."""
+    # 1. Upload dataset A and dataset B
+    csv_a = "order_date,total_revenue\n2024-01-01,100.0\n"
+    csv_b = "order_date,total_revenue\n2024-02-01,200.0\n"
+
+    res_a = client.post("/api/v1/upload", files={"file": ("dataset_a.csv", create_csv_bytes(csv_a), "text/csv")})
+    id_a = res_a.json()["dataset_id"]
+
+    res_b = client.post("/api/v1/upload", files={"file": ("dataset_b.csv", create_csv_bytes(csv_b), "text/csv")})
+    id_b = res_b.json()["dataset_id"]
+
+    # 2. List datasets -> contains both
+    list_res = client.get("/api/v1/datasets")
+    assert list_res.status_code == 200
+    ids = [d["id"] for d in list_res.json()]
+    assert id_a in ids and id_b in ids
+
+    # 3. Delete dataset A
+    del_a = client.delete(f"/api/v1/datasets/{id_a}")
+    assert del_a.status_code == 200
+    assert del_a.json()["dataset_id"] == id_a
+
+    # 4. Verify dataset A is 404 on all endpoints
+    assert client.get(f"/api/v1/datasets/{id_a}").status_code == 404
+    assert client.get(f"/api/v1/analytics/{id_a}/kpis").status_code == 404
+    assert client.get(f"/api/v1/datasets/{id_a}/quality-audit").status_code == 404
+
+    # 5. Verify dataset B remains accessible
+    detail_b = client.get(f"/api/v1/datasets/{id_b}")
+    assert detail_b.status_code == 200
+    assert detail_b.json()["id"] == id_b
+
+    # 6. Delete dataset B
+    del_b = client.delete(f"/api/v1/datasets/{id_b}")
+    assert del_b.status_code == 200
+
+    # 7. Attempting to delete already deleted dataset returns 404
+    del_nonexistent = client.delete(f"/api/v1/datasets/{id_a}")
+    assert del_nonexistent.status_code == 404
+
 
 
