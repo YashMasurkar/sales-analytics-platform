@@ -1,0 +1,44 @@
+# Python virtual environments
+.venv/
+venv/
+ENV/
+env/
+
+# Python bytecode & cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Testing & coverage artifacts
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+.nox/
+
+# Environment configuration & secrets
+.env
+.env.local
+.env.*.local
+
+# Database & Runtime Storage
+*.db
+*.sqlite
+*.sqlite3
+uploads/
+app/static/uploads/
+
+# IDE & Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Distribution / Packaging
+build/
+dist/
+*.egg-info/

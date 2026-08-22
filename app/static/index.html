@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full bg-slate-50">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sales Analytics & Business Intelligence Platform</title>
+    
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#eef2ff',
+                            100: '#e0e7ff',
+                            500: '#6366f1',
+                            600: '#4f46e5',
+                            700: '#4338ca',
+                            900: '#312e81',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
+
+    <!-- Custom CSS Overrides -->
+    <link rel="stylesheet" href="/static/css/custom.css">
+
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        /* Custom scrollbars */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+    </style>
+</head>
+<body class="h-full antialiased text-slate-800 bg-slate-50 flex overflow-hidden">
+
+    <!-- Mobile Navigation Overlay -->
+    <div id="mobile-overlay" class="fixed inset-0 bg-slate-900/40 backdrop-blur-xs z-40 hidden lg:hidden"></div>
+
+    <!-- LEFT SIDEBAR -->
+    <aside id="sidebar" class="fixed inset-y-0 left-0 z-50 w-64 bg-white border-r border-slate-200 flex flex-col justify-between transition-transform duration-300 transform -translate-x-full lg:translate-x-0">
+        <div>
+            <!-- Brand / Header -->
+            <div class="h-16 px-6 flex items-center justify-between border-b border-slate-100">
+                <div class="flex items-center gap-2.5">
+                    <div class="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center text-white shadow-xs">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>
+                    </div>
+                    <div>
+                        <span class="font-bold text-slate-900 text-sm tracking-tight">Sales Analytics</span>
+                        <span class="block text-[10px] text-slate-400 font-semibold tracking-wider uppercase">BI Platform</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Navigation Links -->
+            <nav class="p-4 space-y-1.5">
+                <a href="#dashboard" data-view-target="dashboard" class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-semibold bg-indigo-50 text-indigo-700 transition border border-indigo-100/60">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/></svg>
+                    Dashboard
+                </a>
+                <a href="#datasets" data-view-target="datasets" class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-100/70 transition">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2 1.5 3 3.5 3h9c2 0 3.5-1 3.5-3V7c0-2-1.5-3-3.5-3h-9C5.5 4 4 5 4 7zM4 10h16M4 15h16"/></svg>
+                    Datasets
+                </a>
+                <a href="#quality" data-view-target="quality" class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-100/70 transition">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+                    Data Quality
+                </a>
+
+                <div class="pt-3 pb-1">
+                    <hr class="border-slate-200">
+                </div>
+
+                <a href="#upload" data-view-target="upload" class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-100/70 transition">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg>
+                    Upload Dataset
+                </a>
+
+                <div class="pt-3 pb-1">
+                    <hr class="border-slate-200">
+                </div>
+
+                <a href="#about" data-view-target="about" class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-100/70 transition">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    About & Architecture
+                </a>
+            </nav>
+        </div>
+
+        <!-- Sidebar Footer Status -->
+        <div class="p-4 border-t border-slate-100 bg-slate-50/50">
+            <div class="flex items-center justify-between">
+                <span class="text-xs font-medium text-slate-500">API Status</span>
+                <span id="system-health-pill" class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[11px] font-medium bg-slate-100 text-slate-600 border border-slate-200">
+                    <span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span> Checking...
+                </span>
+            </div>
+            <p class="text-[11px] text-slate-400 mt-2 font-mono">v1.0.0 · FastAPI + SQLite</p>
+        </div>
+    </aside>
+
+    <!-- MAIN CONTENT AREA -->
+    <div class="flex-1 flex flex-col min-w-0 lg:pl-64 h-full overflow-hidden">
+        
+        <!-- Mobile Topbar -->
+        <div class="h-14 bg-white border-b border-slate-200 px-4 flex items-center justify-between lg:hidden shrink-0">
+            <button id="mobile-menu-btn" class="p-2 text-slate-600 hover:text-slate-900 rounded-md focus:outline-hidden" aria-label="Open menu">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+            </button>
+            <span class="font-bold text-slate-900 text-sm">Sales Analytics Platform</span>
+            <div class="w-6"></div>
+        </div>
+
+        <!-- Scrollable Main View Container -->
+        <main class="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">
+
+            <!-- ========================================== -->
+            <!-- VIEW 1: DASHBOARD                          -->
+            <!-- ========================================== -->
+            <section id="view-dashboard" class="space-y-6">
+                
+                <!-- Dashboard Header & Controls -->
+                <div class="bg-white rounded-xl border border-slate-200/80 p-5 sm:p-6 shadow-xs">
+                    <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+                        <div>
+                            <h1 class="text-xl sm:text-2xl font-bold tracking-tight text-slate-900">Sales Overview</h1>
+                            <p class="text-sm text-slate-500 mt-0.5">Analyze your business performance across revenue, products, customers and regions.</p>
+                        </div>
+                        <div class="flex flex-wrap items-center gap-3">
+                            <div class="w-full sm:w-auto">
+                                <label for="dataset-selector" class="sr-only">Select Dataset</label>
+                                <select id="dataset-selector" class="w-full sm:w-64 px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded-lg text-slate-800 font-medium focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-hidden transition">
+                                    <option value="">Loading datasets...</option>
+                                </select>
+                            </div>
+                            <button id="export-cleaned-btn" class="inline-flex items-center gap-2 px-3.5 py-2 text-sm font-medium text-slate-700 bg-white hover:bg-slate-50 border border-slate-300 rounded-lg shadow-2xs transition">
+                                <svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                                Export Cleaned CSV
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Dynamic Multidimensional Filters Bar -->
+                    <div class="mt-5 pt-4 border-t border-slate-100 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 mb-1">Start Date</label>
+                            <input type="date" id="filter-start-date" class="w-full px-3 py-1.5 text-xs bg-slate-50 border border-slate-300 rounded-md text-slate-800 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-hidden">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 mb-1">End Date</label>
+                            <input type="date" id="filter-end-date" class="w-full px-3 py-1.5 text-xs bg-slate-50 border border-slate-300 rounded-md text-slate-800 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-hidden">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 mb-1">Category</label>
+                            <select id="filter-category" class="w-full px-3 py-1.5 text-xs bg-slate-50 border border-slate-300 rounded-md text-slate-800 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-hidden">
+                                <option value="">All Categories</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 mb-1">Region</label>
+                            <select id="filter-region" class="w-full px-3 py-1.5 text-xs bg-slate-50 border border-slate-300 rounded-md text-slate-800 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-hidden">
+                                <option value="">All Regions</option>
+                            </select>
+                        </div>
+                        <div class="flex items-end">
+                            <button id="filter-reset-btn" class="w-full px-3 py-1.5 text-xs font-medium text-slate-600 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 border border-slate-300 rounded-md transition text-center">
+                                Reset Filters
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Empty State (When no dataset exists) -->
+                <div id="dashboard-empty" class="hidden bg-white rounded-xl border border-slate-200/80 p-12 text-center shadow-xs">
+                    <div class="w-12 h-12 rounded-full bg-indigo-50 text-indigo-600 flex items-center justify-center mx-auto mb-4">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 13h6m-3-3v6m5 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                    </div>
+                    <h3 class="text-base font-semibold text-slate-900">No Dataset Selected</h3>
+                    <p class="text-sm text-slate-500 mt-1 mb-5 max-w-sm mx-auto">Upload a sales spreadsheet or try our demo dataset to explore automated data quality auditing and analytics.</p>
+                    <div class="flex items-center justify-center gap-3">
+                        <button data-view-target="upload" class="px-4 py-2 text-sm font-semibold text-white bg-indigo-600 hover:bg-indigo-500 rounded-lg shadow-xs transition">Upload Dataset</button>
+                        <button id="empty-try-demo-btn" class="px-4 py-2 text-sm font-medium text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-lg transition">Try Demo Dataset</button>
+                    </div>
+                </div>
+
+                <!-- Main Analytical Dashboard Grid -->
+                <div id="dashboard-content" class="space-y-6">
+                    
+                    <!-- 1. Four Primary Executive KPI Cards -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
+                        
+                        <!-- KPI 1: Total Revenue -->
+                        <div class="bg-white rounded-xl border border-slate-200/80 p-5 shadow-xs flex flex-col justify-between">
+                            <div>
+                                <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Total Revenue</span>
+                                <div class="text-2xl font-bold tracking-tight text-slate-900 mt-2" id="kpi-revenue">$0.00</div>
+                            </div>
+                            <div class="mt-3 flex items-center justify-between">
+                                <span id="kpi-revenue-mom" class="hidden"></span>
+                            </div>
+                        </div>
+
+                        <!-- KPI 2: Total Profit -->
+                        <div class="bg-white rounded-xl border border-slate-200/80 p-5 shadow-xs flex flex-col justify-between">
+                            <div>
+                                <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Total Profit</span>
+                                <div class="text-2xl font-bold tracking-tight text-slate-900 mt-2" id="kpi-profit">$0.00</div>
+                            </div>
+                            <div class="mt-3">
+                                <span id="kpi-profit-margin" class="text-xs text-slate-500 font-medium"></span>
+                            </div>
+                        </div>
+
+                        <!-- KPI 3: Total Orders -->
+                        <div class="bg-white rounded-xl border border-slate-200/80 p-5 shadow-xs flex flex-col justify-between">
+                            <div>
+                                <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Orders</span>
+                                <div class="text-2xl font-bold tracking-tight text-slate-900 mt-2" id="kpi-orders">0</div>
+                            </div>
+                            <div class="mt-3">
+                                <span id="kpi-aov" class="text-xs text-slate-500 font-medium">AOV: $0.00</span>
+                            </div>
+                        </div>
+
+                        <!-- KPI 4: Unique Customers -->
+                        <div class="bg-white rounded-xl border border-slate-200/80 p-5 shadow-xs flex flex-col justify-between">
+                            <div>
+                                <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Unique Customers</span>
+                                <div class="text-2xl font-bold tracking-tight text-slate-900 mt-2" id="kpi-customers">0</div>
+                            </div>
+                            <div class="mt-3">
+                                <span id="kpi-units" class="text-xs text-slate-500 font-medium"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 2. Revenue Trend Primary Large Chart Card -->
+                    <div class="bg-white rounded-xl border border-slate-200/80 p-5 sm:p-6 shadow-xs">
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
+                            <div>
+                                <h2 class="text-base font-semibold text-slate-900">Revenue Trend</h2>
+                                <p class="text-xs text-slate-500 mt-0.5">Chronological monthly aggregated performance trajectory.</p>
+                            </div>
+                            <div class="inline-flex p-1 bg-slate-100 rounded-lg border border-slate-200 self-start sm:self-auto">
+                                <button data-metric="revenue" class="trend-metric-btn px-3 py-1 text-xs font-semibold bg-white text-slate-900 rounded-md shadow-xs transition">Revenue</button>
+                                <button data-metric="profit" class="trend-metric-btn px-3 py-1 text-xs font-medium text-slate-500 hover:text-slate-900 rounded-md transition">Profit</button>
+                                <button data-metric="order_count" class="trend-metric-btn px-3 py-1 text-xs font-medium text-slate-500 hover:text-slate-900 rounded-md transition">Orders</button>
+                            </div>
+                        </div>
+                        <div class="relative h-72 w-full">
+                            <canvas id="trend-chart-canvas"></canvas>
+                            <div id="trend-chart-canvas-empty" class="hidden absolute inset-0 flex items-center justify-center text-sm text-slate-400">
+                                No historical trend data available.
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 3. Category & Regional Horizontal Bar Charts -->
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        
+                        <!-- Category Performance Card -->
+                        <div class="bg-white rounded-xl border border-slate-200/80 p-5 sm:p-6 shadow-xs flex flex-col justify-between">
+                            <div>
+                                <h2 class="text-base font-semibold text-slate-900">Category Performance</h2>
+                                <p class="text-xs text-slate-500 mt-0.5">Revenue breakdown by product category.</p>
+                            </div>
+                            <div class="relative h-64 w-full mt-4">
+                                <canvas id="category-chart-canvas"></canvas>
+                                <div id="category-chart-empty" class="hidden absolute inset-0 flex flex-col items-center justify-center text-center p-4">
+                                    <span class="text-xs font-semibold text-slate-700">Category analysis unavailable</span>
+                                    <span class="text-xs text-slate-400 mt-1">This dataset does not contain category information.</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Regional Performance Card -->
+                        <div class="bg-white rounded-xl border border-slate-200/80 p-5 sm:p-6 shadow-xs flex flex-col justify-between">
+                            <div>
+                                <h2 class="text-base font-semibold text-slate-900">Regional Performance</h2>
+                                <p class="text-xs text-slate-500 mt-0.5">Sales distribution across geographic territories.</p>
+                            </div>
+                            <div class="relative h-64 w-full mt-4">
+                                <canvas id="region-chart-canvas"></canvas>
+                                <div id="region-chart-empty" class="hidden absolute inset-0 flex flex-col items-center justify-center text-center p-4">
+                                    <span class="text-xs font-semibold text-slate-700">Regional analysis unavailable</span>
+                                    <span class="text-xs text-slate-400 mt-1">This dataset does not contain region information.</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 4. Product Performance Table Card -->
+                    <div class="bg-white rounded-xl border border-slate-200/80 shadow-xs overflow-hidden">
+                        <div class="p-5 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                            <div>
+                                <h2 class="text-base font-semibold text-slate-900">Product Performance</h2>
+                                <p class="text-xs text-slate-500 mt-0.5">Revenue-based ranking of top and lowest-performing products.</p>
+                            </div>
+                            <div class="inline-flex gap-2">
+                                <button id="prod-tab-top" class="px-3 py-1.5 text-xs font-semibold text-indigo-700 bg-indigo-50 border border-indigo-200 rounded-md transition">Top Revenue</button>
+                                <button id="prod-tab-bottom" class="px-3 py-1.5 text-xs font-medium text-slate-600 hover:text-slate-900 bg-white border border-slate-200 rounded-md transition">Lowest Revenue</button>
+                            </div>
+                        </div>
+                        <div id="product-table-container" class="overflow-x-auto">
+                            <table class="w-full text-left border-collapse">
+                                <thead>
+                                    <tr class="bg-slate-50/75 text-[11px] font-semibold text-slate-500 uppercase tracking-wider border-b border-slate-200">
+                                        <th class="px-4 py-3 text-center w-12">#</th>
+                                        <th class="px-4 py-3">Product</th>
+                                        <th class="px-4 py-3 text-right">Revenue</th>
+                                        <th class="px-4 py-3 text-right">Orders</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="product-table-body" class="divide-y divide-slate-100">
+                                    <!-- Rendered dynamically -->
+                                </tbody>
+                            </table>
+                        </div>
+                        <div id="product-table-empty" class="hidden p-8 text-center">
+                            <span class="text-xs font-semibold text-slate-700 block">Product analysis unavailable</span>
+                            <span class="text-xs text-slate-400 mt-1 block">This dataset does not contain product information.</span>
+                        </div>
+                    </div>
+
+                </div>
+            </section>
+
+
+            <!-- ========================================== -->
+            <!-- VIEW 2: DATASETS MANAGEMENT                -->
+            <!-- ========================================== -->
+            <section id="view-datasets" class="hidden space-y-6">
+                <div class="bg-white rounded-xl border border-slate-200/80 p-5 sm:p-6 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div>
+                        <h1 class="text-xl sm:text-2xl font-bold tracking-tight text-slate-900">Datasets</h1>
+                        <p class="text-sm text-slate-500 mt-0.5">Manage uploaded sales datasets, view audit logs, and download cleaned data.</p>
+                    </div>
+                    <button data-view-target="upload" class="inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold text-white bg-indigo-600 hover:bg-indigo-500 rounded-lg shadow-xs transition">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                        Upload Dataset
+                    </button>
+                </div>
+
+                <div class="bg-white rounded-xl border border-slate-200/80 shadow-xs overflow-hidden">
+                    <div id="datasets-table-container" class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="bg-slate-50/75 text-[11px] font-semibold text-slate-500 uppercase tracking-wider border-b border-slate-200">
+                                    <th class="px-6 py-3.5">Filename</th>
+                                    <th class="px-6 py-3.5">Upload Date</th>
+                                    <th class="px-6 py-3.5 text-right">Valid / Raw Rows</th>
+                                    <th class="px-6 py-3.5 text-center">Quality Score</th>
+                                    <th class="px-6 py-3.5 text-right">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="datasets-table-body" class="divide-y divide-slate-100">
+                                <!-- Rendered dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div id="datasets-empty-state" class="hidden p-12 text-center">
+                        <div class="w-12 h-12 rounded-full bg-slate-100 text-slate-400 flex items-center justify-center mx-auto mb-4">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2 1.5 3 3.5 3h9c2 0 3.5-1 3.5-3V7c0-2-1.5-3-3.5-3h-9C5.5 4 4 5 4 7z"/></svg>
+                        </div>
+                        <h3 class="text-base font-semibold text-slate-900">No Datasets Uploaded</h3>
+                        <p class="text-sm text-slate-500 mt-1 mb-5 max-w-sm mx-auto">Upload your first sales dataset in CSV, XLSX, or XLS format to start analyzing your business.</p>
+                        <button data-view-target="upload" class="px-4 py-2 text-sm font-semibold text-white bg-indigo-600 hover:bg-indigo-500 rounded-lg shadow-xs transition">Upload Dataset</button>
+                    </div>
+                </div>
+            </section>
+
+
+            <!-- ========================================== -->
+            <!-- VIEW 3: DATA QUALITY & REVIEW GATE         -->
+            <!-- ========================================== -->
+            <section id="view-quality" class="hidden space-y-6">
+                
+                <div class="bg-white rounded-xl border border-slate-200/80 p-5 sm:p-6 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div>
+                        <div class="flex items-center gap-3">
+                            <h1 class="text-xl sm:text-2xl font-bold tracking-tight text-slate-900">Data Quality Review</h1>
+                            <span id="quality-score-badge" class="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                                Excellent Quality
+                            </span>
+                        </div>
+                        <p class="text-sm text-slate-500 mt-0.5">Your dataset has been analyzed and validated before analytics are generated.</p>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <button id="standalone-view-details-btn" class="px-3.5 py-2 text-sm font-medium text-slate-700 bg-white hover:bg-slate-50 border border-slate-300 rounded-lg shadow-2xs transition">
+                            View Detailed Audit
+                        </button>
+                        <button id="review-gate-continue-btn" class="px-4 py-2 text-sm font-semibold text-white bg-indigo-600 hover:bg-indigo-500 rounded-lg shadow-xs transition">
+                            Continue to Dashboard →
+                        </button>
+                    </div>
+                </div>
+
+                <div id="quality-content" class="space-y-6">
+                    
+                    <!-- Health Score Hero Card -->
+                    <div class="bg-gradient-to-r from-indigo-900 to-slate-900 text-white rounded-xl p-6 sm:p-8 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-6">
+                        <div>
+                            <span class="text-xs uppercase font-semibold text-indigo-300 tracking-wider">Overall Dataset Integrity</span>
+                            <div class="text-4xl sm:text-5xl font-extrabold tracking-tight mt-1" id="quality-score-value">100.0/100</div>
+                            <p class="text-xs sm:text-sm text-slate-300 mt-2 max-w-lg">
+                                Health score reflects the ratio of clean records, penalized proportionally by missing key dimensions, type anomalies, and unresolvable data.
+                            </p>
+                        </div>
+                        <div class="bg-white/10 backdrop-blur-xs rounded-lg p-4 border border-white/10 shrink-0 text-left">
+                            <span class="text-[11px] font-semibold text-slate-300 uppercase block mb-1">Analytical Guarantee</span>
+                            <div class="text-xs text-white space-y-1">
+                                <div class="flex items-center gap-1.5"><span class="text-emerald-400">✓</span> No numerical value fabrication</div>
+                                <div class="flex items-center gap-1.5"><span class="text-emerald-400">✓</span> Explicit 'Unspecified' dimension labels</div>
+                                <div class="flex items-center gap-1.5"><span class="text-emerald-400">✓</span> Returns preserved as anomalies</div>
+                                <div class="flex items-center gap-1.5"><span class="text-emerald-400">✓</span> Exact duplicate deduplication</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Metrics Grid -->
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                        <div class="bg-white rounded-xl border border-slate-200/80 p-4 shadow-xs">
+                            <span class="text-xs font-semibold text-slate-500">Total Raw Rows</span>
+                            <div class="text-xl font-bold text-slate-900 mt-1" id="quality-raw-rows">0</div>
+                        </div>
+                        <div class="bg-white rounded-xl border border-slate-200/80 p-4 shadow-xs">
+                            <span class="text-xs font-semibold text-slate-500">Valid Cleaned Rows</span>
+                            <div class="text-xl font-bold text-emerald-600 mt-1" id="quality-valid-rows">0</div>
+                        </div>
+                        <div class="bg-white rounded-xl border border-slate-200/80 p-4 shadow-xs">
+                            <span class="text-xs font-semibold text-slate-500">Excluded Rows</span>
+                            <div class="text-xl font-bold text-rose-600 mt-1" id="quality-excluded-rows">0</div>
+                        </div>
+                        <div class="bg-white rounded-xl border border-slate-200/80 p-4 shadow-xs">
+                            <span class="text-xs font-semibold text-slate-500">Exact Duplicates</span>
+                            <div class="text-xl font-bold text-slate-900 mt-1" id="quality-duplicate-rows">0</div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                        <div class="bg-white rounded-xl border border-slate-200/80 p-4 shadow-xs">
+                            <span class="text-xs font-semibold text-slate-500">Invalid Dates</span>
+                            <div class="text-xl font-bold text-slate-900 mt-1" id="quality-invalid-dates">0</div>
+                        </div>
+                        <div class="bg-white rounded-xl border border-slate-200/80 p-4 shadow-xs">
+                            <span class="text-xs font-semibold text-slate-500">Invalid Numerics</span>
+                            <div class="text-xl font-bold text-slate-900 mt-1" id="quality-invalid-numerics">0</div>
+                        </div>
+                        <div class="bg-white rounded-xl border border-slate-200/80 p-4 shadow-xs">
+                            <span class="text-xs font-semibold text-slate-500">Derived Values</span>
+                            <div class="text-xl font-bold text-indigo-600 mt-1" id="quality-derived-values">0</div>
+                        </div>
+                        <div class="bg-white rounded-xl border border-slate-200/80 p-4 shadow-xs">
+                            <span class="text-xs font-semibold text-slate-500">Anomalies Detected</span>
+                            <div class="text-xl font-bold text-amber-600 mt-1" id="quality-anomalies-count">0</div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div id="quality-empty" class="hidden bg-white rounded-xl border border-slate-200/80 p-12 text-center shadow-xs">
+                    <h3 class="text-base font-semibold text-slate-900">No Dataset Loaded</h3>
+                    <p class="text-sm text-slate-500 mt-1 mb-5">Please upload or select a dataset to review its data quality audit.</p>
+                    <button data-view-target="upload" class="px-4 py-2 text-sm font-semibold text-white bg-indigo-600 hover:bg-indigo-500 rounded-lg shadow-xs transition">Upload Dataset</button>
+                </div>
+            </section>
+
+
+            <!-- ========================================== -->
+            <!-- VIEW 4: UPLOAD DATASET                     -->
+            <!-- ========================================== -->
+            <section id="view-upload" class="hidden max-w-3xl mx-auto space-y-6">
+                
+                <div class="bg-white rounded-xl border border-slate-200/80 p-6 sm:p-8 shadow-xs text-center">
+                    <h1 class="text-2xl font-bold tracking-tight text-slate-900">Upload Dataset</h1>
+                    <p class="text-sm text-slate-500 mt-1 max-w-md mx-auto">Upload your sales spreadsheet to validate data quality, compute business KPIs, and generate interactive visual analytics.</p>
+
+                    <!-- Upload Form Container -->
+                    <div id="upload-form-container" class="mt-8">
+                        <div id="drop-zone" class="border-2 border-dashed border-slate-300 hover:border-indigo-500 rounded-xl p-8 sm:p-12 transition-all bg-slate-50/50 flex flex-col items-center justify-center cursor-pointer">
+                            <div class="w-12 h-12 rounded-full bg-indigo-50 text-indigo-600 flex items-center justify-center mb-4">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg>
+                            </div>
+                            <span class="text-sm font-semibold text-slate-800">Drop your file here</span>
+                            <span class="text-xs text-slate-400 mt-1">or</span>
+                            <button type="button" id="browse-file-btn" class="mt-2 px-4 py-2 text-xs font-semibold text-indigo-700 bg-white hover:bg-indigo-50 border border-indigo-200 rounded-lg shadow-2xs transition">Browse Files</button>
+                            <input type="file" id="file-input" accept=".csv,.xlsx,.xls" class="hidden">
+                            <span class="text-[11px] text-slate-400 mt-4 font-mono">Supported formats: CSV · XLSX · XLS (Max 50MB)</span>
+                        </div>
+
+                        <div class="mt-6 flex items-center justify-center gap-4">
+                            <span class="text-xs text-slate-400">Want to test the platform immediately?</span>
+                            <button type="button" id="try-demo-btn" class="text-xs font-semibold text-indigo-600 hover:text-indigo-800 transition underline underline-offset-2">
+                                Try Demo Dataset
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Processing State Indicator -->
+                    <div id="upload-processing-container" class="hidden mt-8 p-12 bg-slate-50 rounded-xl border border-slate-200 flex flex-col items-center justify-center">
+                        <div class="w-10 h-10 border-3 border-indigo-600 border-t-transparent rounded-full animate-spin mb-4"></div>
+                        <h3 class="text-sm font-semibold text-slate-900" id="upload-step-label">Uploading dataset...</h3>
+                        <p class="text-xs text-slate-500 mt-1">Running schema mapping, deduplication, and quality audit engine.</p>
+                    </div>
+                </div>
+
+                <!-- Guidelines Box -->
+                <div class="bg-white rounded-xl border border-slate-200/80 p-5 shadow-xs text-left">
+                    <h3 class="text-xs font-semibold text-slate-900 uppercase tracking-wider mb-2">Ingestion Requirements</h3>
+                    <ul class="text-xs text-slate-600 space-y-1.5">
+                        <li class="flex items-start gap-2"><span class="text-indigo-500">•</span> Mandatory fields: <strong class="text-slate-800">Order Date</strong> and either <strong class="text-slate-800">Total Revenue</strong> or (<strong class="text-slate-800">Quantity</strong> + <strong class="text-slate-800">UnitPrice</strong>).</li>
+                        <li class="flex items-start gap-2"><span class="text-indigo-500">•</span> Supported optional dimensions: Customer ID/Name, Product Name, Category, Sub-Category, Region, Discount, Total Cost.</li>
+                        <li class="flex items-start gap-2"><span class="text-indigo-500">•</span> Missing optional dimensions are handled with graceful analytical degradation.</li>
+                    </ul>
+                </div>
+            </section>
+
+
+            <!-- ========================================== -->
+            <!-- VIEW 5: ABOUT & ARCHITECTURE               -->
+            <!-- ========================================== -->
+            <section id="view-about" class="hidden max-w-4xl mx-auto space-y-6">
+                <div class="bg-white rounded-xl border border-slate-200/80 p-6 sm:p-8 shadow-xs">
+                    <h1 class="text-2xl font-bold tracking-tight text-slate-900">About the Platform</h1>
+                    <p class="text-sm text-slate-500 mt-1">Sales Analytics & Business Intelligence Engine designed for high data integrity.</p>
+
+                    <div class="mt-6 space-y-6 text-sm text-slate-700 leading-relaxed">
+                        <div>
+                            <h3 class="text-base font-semibold text-slate-900 mb-2">1. Core Analytical Integrity Principles</h3>
+                            <p class="text-slate-600">Unlike superficial dashboards that silently impute zeros or fabricate missing values, this system implements rigorous data auditing:</p>
+                            <ul class="list-disc pl-5 mt-2 space-y-1 text-slate-600 text-xs">
+                                <li><strong>No Statistical Imputation:</strong> Missing numerical values (revenue, cost, quantity, dates) are detected, audited, and excluded with explicit reasoning rather than statistically invented. Missing categorical dimensions are clearly labeled with an explicit 'Unspecified' placeholder.</li>
+                                <li><strong>Returns & Adjustments Preserved:</strong> Negative quantities and revenues are classified as anomalies for audit transparency, not silently deleted.</li>
+                                <li><strong>Explicit Derivations:</strong> Derived metrics (e.g. Revenue = Quantity × UnitPrice × (1 - Discount)) are tracked and audited.</li>
+                                <li><strong>Conservative Schema Mapping:</strong> Unrestricted fuzzy matching is avoided to prevent ambiguous field mappings.</li>
+                            </ul>
+                        </div>
+
+                        <hr class="border-slate-100">
+
+                        <div>
+                            <h3 class="text-base font-semibold text-slate-900 mb-2">2. Architecture & Tech Stack</h3>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-3">
+                                <div class="p-3.5 bg-slate-50 rounded-lg border border-slate-200">
+                                    <span class="text-xs font-semibold text-slate-900 block">Backend Framework</span>
+                                    <span class="text-xs text-slate-600 mt-0.5 block">FastAPI + Python 3.14 (Clean Architecture)</span>
+                                </div>
+                                <div class="p-3.5 bg-slate-50 rounded-lg border border-slate-200">
+                                    <span class="text-xs font-semibold text-slate-900 block">Data Engine</span>
+                                    <span class="text-xs text-slate-600 mt-0.5 block">Pandas, NumPy, openpyxl, xlrd</span>
+                                </div>
+                                <div class="p-3.5 bg-slate-50 rounded-lg border border-slate-200">
+                                    <span class="text-xs font-semibold text-slate-900 block">Database & ORM</span>
+                                    <span class="text-xs text-slate-600 mt-0.5 block">SQLAlchemy 2.0 + Alembic Migrations</span>
+                                </div>
+                                <div class="p-3.5 bg-slate-50 rounded-lg border border-slate-200">
+                                    <span class="text-xs font-semibold text-slate-900 block">Frontend Stack</span>
+                                    <span class="text-xs text-slate-600 mt-0.5 block">HTML5, Tailwind CSS, Vanilla JS ES Modules, Chart.js</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- DETAILED AUDIT MODAL                       -->
+    <!-- ========================================== -->
+    <div id="audit-modal" class="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-xs hidden items-center justify-center p-4">
+        <div class="bg-white rounded-xl max-w-2xl w-full max-h-[90vh] border border-slate-200 shadow-2xl flex flex-col overflow-hidden">
+            <!-- Fixed Modal Header -->
+            <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between shrink-0 bg-white">
+                <div>
+                    <h3 class="text-lg font-bold text-slate-900">Detailed Data Quality Audit</h3>
+                    <p class="text-xs text-slate-500 font-mono mt-0.5" id="audit-modal-filename">Dataset Audit</p>
+                </div>
+                <button id="close-audit-modal-btn" class="p-1.5 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-lg transition" aria-label="Close modal">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
+            </div>
+
+            <!-- Inner Scrollable Content Area -->
+            <div class="flex-1 overflow-y-auto px-6 py-5 space-y-5 text-sm custom-modal-scroll">
+                <!-- Missing Values -->
+                <div>
+                    <h4 class="text-xs font-bold text-slate-800 uppercase tracking-wider mb-2">Missing Values by Field</h4>
+                    <div class="border border-slate-200 rounded-lg overflow-hidden">
+                        <table class="w-full text-left">
+                            <tbody id="audit-modal-missing-body"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Exclusion Reasons -->
+                <div>
+                    <h4 class="text-xs font-bold text-slate-800 uppercase tracking-wider mb-2">Row Exclusion Breakdown</h4>
+                    <div class="border border-slate-200 rounded-lg overflow-hidden">
+                        <table class="w-full text-left">
+                            <tbody id="audit-modal-exclusion-body"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Detected Anomalies -->
+                <div>
+                    <h4 class="text-xs font-bold text-slate-800 uppercase tracking-wider mb-2">Detected Business Anomalies</h4>
+                    <div id="audit-modal-anomalies" class="grid grid-cols-1 sm:grid-cols-2 gap-2"></div>
+                </div>
+
+                <!-- Cleaning Changelog -->
+                <div>
+                    <h4 class="text-xs font-bold text-slate-800 uppercase tracking-wider mb-2">Transformation & Derivation Changelog</h4>
+                    <ul id="audit-modal-changelog" class="p-3 bg-slate-50 rounded-lg border border-slate-200 space-y-1.5"></ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- CONFIRMATION MODAL                         -->
+    <!-- ========================================== -->
+    <div id="confirm-modal" class="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-xs hidden items-center justify-center p-4">
+        <div class="bg-white rounded-xl max-w-md w-full border border-slate-200 shadow-2xl p-6 text-left">
+            <h3 class="text-base font-bold text-slate-900" id="confirm-modal-title">Confirm Action</h3>
+            <p class="text-sm text-slate-600 mt-2" id="confirm-modal-body">Are you sure you want to proceed?</p>
+            <div class="mt-6 flex items-center justify-end gap-3">
+                <button onclick="UI.closeModal('confirm-modal')" class="px-3.5 py-2 text-xs font-medium text-slate-700 bg-white hover:bg-slate-100 border border-slate-300 rounded-lg transition">Cancel</button>
+                <button id="confirm-modal-btn" class="px-4 py-2 text-xs font-semibold text-white bg-rose-600 hover:bg-rose-500 rounded-lg shadow-xs transition">Confirm</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification Container -->
+    <div id="toast-container" class="fixed top-4 right-4 z-50 flex flex-col gap-2 max-w-sm w-full pointer-events-auto"></div>
+
+    <!-- Application Script Initializer -->
+    <script type="module" src="/static/js/app.js"></script>
+</body>
+</html>

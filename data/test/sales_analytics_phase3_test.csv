@@ -1,0 +1,12 @@
+order_date,order_id,customer_id,customer_name,product_id,product_name,category,region,quantity,unit_price,discount,total_revenue,total_cost,profit
+2024-01-05,ORD-101,CUST-01,Acme Corp,PROD-01,Widget A,Electronics,North,2,50.00,0.00,100.00,60.00,40.00
+2024-01-05,ORD-101,CUST-01,Acme Corp,PROD-01,Widget A,Electronics,North,2,50.00,0.00,100.00,60.00,40.00
+2024-01-12,ORD-102,CUST-02,,PROD-02,Widget B,Electronics,South,1,150.00,0.00,150.00,90.00,60.00
+2024-01-18,ORD-103,CUST-03,Beta LLC,PROD-03,Office Chair,Furniture,East,-1,200.00,0.00,-200.00,120.00,-320.00
+2024-01-25,ORD-104,CUST-04,Gamma Inc,PROD-04,Desk Lamp,Furniture,West,3,40.00,0.00,120.00,70.00,50.00
+2024-02-02,ORD-105,CUST-05,Delta Co,PROD-01,Widget A,Electronics,North,4,50.00,0.00,200.00,120.00,80.00
+2024-02-10,ORD-106,CUST-06,Epsilon Ltd,PROD-05,Paper Box,Supplies,South,10,15.00,0.00,150.00,80.00,70.00
+2024-02-16,ORD-107,CUST-07,Zeta Corp,PROD-02,Widget B,Electronics,East,2,150.00,0.00,300.00,180.00,120.00
+2024-02-22,ORD-108,CUST-08,Eta LLC,PROD-06,Filing Cabinet,Furniture,West,1,300.00,0.00,300.00,180.00,120.00
+2024-03-01,ORD-109,CUST-09,Theta Inc,PROD-07,Pen Pack,Supplies,North,5,20.00,0.00,100.00,40.00,60.00
+2024-03-15,ORD-110,CUST-10,Iota Co,PROD-03,Office Chair,Furniture,South,2,200.00,0.00,400.00,240.00,160.00
