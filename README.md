@@ -1,18 +1,40 @@
 # Sales Analytics & Business Intelligence Platform
 
-A portfolio-grade web application built to automate sales dataset ingestion, rigorous data quality auditing, financial/volume KPI computation, and interactive visual business intelligence exploration.
+A portfolio-grade web application built to automate sales dataset ingestion, rigorous data quality auditing, financial and volume KPI computation, and interactive visual business intelligence exploration.
+
+---
+
+## 🌐 Live Demo
+
+**Live Application:** https://sales-analytics-platform-qjum.onrender.com/
+
+The deployed application is live and allows users to:
+
+- **Upload sales datasets** in CSV, XLSX, or XLS formats
+- **Load the built-in demo dataset** for immediate exploration
+- **Review automated data-quality results**, anomaly detection logs, schema mappings, and health scores
+- **Explore executive KPIs and interactive analytics**, including revenue/profit trends, category distributions, regional breakdowns, and product rankings
+- **Apply date, category, and region filters**, individually or in combination
+- **Remove datasets** using an interactive confirmation modal with Cancel and Delete actions
+- **Export cleaned datasets** as standardized CSV files
 
 ---
 
 ## 🎯 Project Overview & Purpose
 
-Designed as a flagship project for a **Data Analyst → Data Scientist** career path, this platform demonstrates production-level data engineering, deterministic data cleaning, and full-stack analytical architecture.
+Designed as a flagship project for a **Data Analyst → Data Scientist** career path, this platform demonstrates data engineering, deterministic data cleaning, backend API development, database persistence, and full-stack analytical visualization.
 
 ### Key Pillars
-- **Analytical Integrity & Non-Fabrication**: Unlike superficial dashboards that blindly impute zeros or invent missing values, this engine detects and isolates missing financials, tracking explicit data exclusion reasons and anomaly classifications.
-- **Graceful Analytical Degradation**: Missing optional dimensions (e.g., cost, customer ID, category, region) do not crash calculations; the UI cleanly disables dependent metrics while preserving valid core analytics.
-- **Zero-Build Frontend Architecture**: A single-runtime deployment leveraging FastAPI to serve both the REST API and the responsive single-page Vanilla JS/Tailwind CSS dashboard with Chart.js visualization.
-- **Database & Migration Layer**: Built on SQLAlchemy 2.0 with Alembic batch migrations supporting local SQLite and cloud PostgreSQL.
+
+- **Analytical Integrity & Non-Fabrication**: Missing numerical values are not blindly replaced with zeros or invented values. The platform explicitly identifies missing, invalid, excluded, and derived data.
+
+- **Graceful Analytical Degradation**: Missing optional dimensions such as cost, customer ID, category, or region do not crash the analytical pipeline. Dependent metrics are clearly marked as unavailable while valid analytics continue to work.
+
+- **Deterministic Revenue Derivation**: When raw revenue is missing, the engine derives it when valid quantity and unit price values are available, accounting for discounts and recording the derivation in the quality audit.
+
+- **Zero-Build Frontend Architecture**: FastAPI serves both the REST API and the responsive Vanilla JavaScript dashboard using HTML, Tailwind CSS, and Chart.js.
+
+- **Database & Migration Layer**: SQLAlchemy 2.0 provides the ORM layer while Alembic manages database migrations. SQLite is the current database implementation.
 
 ---
 
@@ -20,61 +42,90 @@ Designed as a flagship project for a **Data Analyst → Data Scientist** career 
 
 | Layer | Technologies |
 | :--- | :--- |
-| **Backend Framework** | Python 3.10+, FastAPI, Pydantic v2, Pydantic-Settings |
-| **Data Processing** | Pandas 2.2+, NumPy, openpyxl, xlrd |
-| **Database & ORM** | SQLAlchemy 2.0, SQLite (Dev) / PostgreSQL (Prod), Alembic 1.13+ |
-| **Testing** | Pytest, HTTPX (FastAPI TestClient) |
-| **Frontend** | HTML5, Tailwind CSS (via CDN), Vanilla JavaScript ES Modules, Chart.js 4.4+ |
+| **Backend Framework** | Python 3.14, FastAPI, Pydantic v2, Pydantic-Settings |
+| **Data Processing** | Pandas 2.2+, NumPy, openpyxl, xlrd, xlwt |
+| **Database & ORM** | SQLite, SQLAlchemy 2.0, Alembic 1.13+ |
+| **Testing Suite** | Pytest, HTTPX, 70 automated tests |
+| **Frontend UI** | HTML5, Tailwind CSS, Vanilla JavaScript ES Modules, Chart.js 4.4+ |
 | **ASGI Server** | Uvicorn |
+| **Deployment** | Render Web Service |
 
 ---
 
 ## 🏛️ System Architecture & Project Structure
 
-```
+```text
 sales-analytics-platform/
-├── alembic/                      # Alembic database migration scripts
-│   ├── versions/                 # Version migration definitions
-│   └── env.py                    # Migration environment configuration
-├── app/                          # Core application package
-│   ├── api/                      # API routing layer
-│   │   └── v1/                   # API Version 1 endpoints
-│   │       ├── endpoints/        # Focused route modules (upload, datasets, analytics, export, health)
-│   │       └── router.py         # Master API v1 router
-│   ├── core/                     # Business logic and analytical processing engines
-│   │   ├── cleaner.py            # Cleansing, deduplication, and quality scoring
-│   │   ├── exceptions.py         # Domain-specific exception definitions
-│   │   ├── ingestion.py          # File validation and dataframe parsing (CSV/XLSX/XLS)
-│   │   ├── kpi_engine.py         # Vectorized KPI calculation and trend aggregations
-│   │   └── schema_mapper.py      # Conservative canonical column mapper
-│   ├── db/                       # Database session and ORM models
-│   │   ├── models/               # SQLAlchemy models (Dataset, SalesRecord, DataQualityLog, KPICache)
-│   │   └── session.py            # Engine, session factory, and table initializers
-│   ├── schemas/                  # Pydantic validation and serialization schemas
-│   ├── static/                   # Static frontend application assets
-│   │   ├── css/                  # Custom CSS styles and scrollbars
-│   │   ├── data/                 # Demo dataset copy for client-side loading
-│   │   ├── js/                   # Modular Vanilla JS controllers (api, charts, dashboard, audit, etc.)
-│   │   └── index.html            # Single-page application shell
-│   ├── config.py                 # Application configuration via pydantic-settings
-│   └── main.py                   # FastAPI application factory and entry point
-├── data/                         # Data fixtures
-│   ├── demo/                     # Representative demo sales CSV
-│   └── test/                     # Edge-case regression test datasets
-├── tests/                        # Automated Pytest suite (66 tests)
-│   ├── test_api.py               # REST endpoint integration tests
-│   ├── test_cleaner.py           # Data cleaner and deduplication unit tests
-│   ├── test_health.py            # Server health and model initialization tests
-│   ├── test_ingestion.py         # File ingestion and parsing tests
-│   ├── test_kpi_engine.py        # Vectorized KPI calculations and degradation tests
-│   ├── test_pipeline_fixtures.py # End-to-end pipeline edge case fixture tests
-│   └── test_schema_mapper.py     # Column synonym mapping and ambiguity tests
-├── .env.example                  # Environment configuration template
-├── .gitignore                    # Git tracking rules
-├── alembic.ini                   # Alembic configuration
-├── pytest.ini                    # Pytest settings
-├── requirements.txt              # Production and development dependencies
-└── README.md                     # Project documentation
+
+├── alembic/
+│   ├── versions/
+│   │   └── 0001_initial_schema.py
+│   └── env.py
+│
+├── app/
+│   ├── api/
+│   │   └── v1/
+│   │       ├── endpoints/
+│   │       │   ├── analytics.py
+│   │       │   ├── datasets.py
+│   │       │   ├── export.py
+│   │       │   ├── health.py
+│   │       │   └── upload.py
+│   │       └── router.py
+│   │
+│   ├── core/
+│   │   ├── cleaner.py
+│   │   ├── exceptions.py
+│   │   ├── ingestion.py
+│   │   ├── kpi_engine.py
+│   │   └── schema_mapper.py
+│   │
+│   ├── db/
+│   │   ├── models/
+│   │   │   ├── data_quality.py
+│   │   │   ├── dataset.py
+│   │   │   ├── kpi_cache.py
+│   │   │   └── sales_record.py
+│   │   └── session.py
+│   │
+│   ├── schemas/
+│   │   ├── analytics.py
+│   │   ├── data_quality.py
+│   │   ├── dataset.py
+│   │   └── upload.py
+│   │
+│   ├── static/
+│   │   ├── css/
+│   │   ├── data/
+│   │   ├── js/
+│   │   └── index.html
+│   │
+│   ├── config.py
+│   └── main.py
+│
+├── data/
+│   ├── demo/
+│   │   └── demo_sales.csv
+│   └── test/
+│
+├── tests/
+│   ├── conftest.py
+│   ├── test_api.py
+│   ├── test_cleaner.py
+│   ├── test_health.py
+│   ├── test_ingestion.py
+│   ├── test_kpi_engine.py
+│   ├── test_pipeline_fixtures.py
+│   ├── test_schema_mapper.py
+│   └── verify_real_db.py
+│
+├── .env.example
+├── .gitignore
+├── .python-version
+├── alembic.ini
+├── pytest.ini
+├── requirements.txt
+└── README.md
 ```
 
 ---
@@ -82,38 +133,59 @@ sales-analytics-platform/
 ## 🚀 Quickstart & Setup Guide
 
 ### 1. Prerequisites
-- **Python 3.10+** (tested on Python 3.10, 3.11, 3.12, 3.13, 3.14)
-- Git
 
-### 2. Environment Setup
-```powershell
-# Clone the repository
-git clone https://github.com/username/sales-analytics-platform.git
+- **Python 3.14**
+- **Git**
+
+### 2. Clone the Repository
+
+```bash
+git clone https://github.com/YashMasurkar/sales-analytics-platform.git
 cd sales-analytics-platform
+```
 
-# Create Python virtual environment
+### 3. Create a Virtual Environment
+
+```bash
 python -m venv .venv
+```
 
-# Activate virtual environment
-# Windows PowerShell:
+Activate it:
+
+**Windows PowerShell**
+
+```powershell
 .\.venv\Scripts\Activate.ps1
-# Linux / macOS:
-source .venv/bin/activate
+```
 
-# Install dependencies
+**Linux / macOS**
+
+```bash
+source .venv/bin/activate
+```
+
+### 4. Install Dependencies
+
+```bash
 pip install -r requirements.txt
 ```
 
-### 3. Configure Environment Variables
-```powershell
-# Windows PowerShell:
-Copy-Item .env.example .env
+### 5. Configure Environment Variables
 
-# Linux / macOS:
+**Windows PowerShell**
+
+```powershell
+Copy-Item .env.example .env
+```
+
+**Linux / macOS**
+
+```bash
 cp .env.example .env
 ```
 
-Review `.env` parameters:
+Review the configuration:
+
 ```ini
 APP_NAME="Sales Analytics & Business Intelligence Platform"
 APP_ENV=development
@@ -125,103 +197,628 @@ UPLOAD_DIR=./uploads
 MAX_UPLOAD_SIZE_MB=50
 ```
 
-### 4. Database Initialization & Migrations
-```powershell
-# Run database migrations using Alembic
+### 6. Database Initialization & Migrations
+
+Run the Alembic migration:
+
+```bash
 alembic upgrade head
 ```
 
-### 5. Running the Application
-```powershell
+### 7. Run the Application
+
+```bash
 uvicorn app.main:app --reload --host 127.0.0.1 --port 8000
 ```
-- **Web UI & Dashboard**: [http://127.0.0.1:8000](http://127.0.0.1:8000)
-- **Interactive OpenAPI Documentation (Swagger)**: [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs)
-- **Alternative Documentation (ReDoc)**: [http://127.0.0.1:8000/redoc](http://127.0.0.1:8000/redoc)
-- **Health Check**: [http://127.0.0.1:8000/api/v1/health](http://127.0.0.1:8000/api/v1/health)
 
-### 6. Running the Automated Test Suite
-```powershell
-pytest -v
+The application will be available at:
+
+- **Web UI:** http://127.0.0.1:8000
+- **Swagger API Docs:** http://127.0.0.1:8000/docs
+- **ReDoc:** http://127.0.0.1:8000/redoc
+- **Health Check:** http://127.0.0.1:8000/api/v1/health
+
+---
+
+## ☁️ Deployment
+
+The application is deployed as a **Render Web Service**.
+
+- **Live URL:** https://sales-analytics-platform-qjum.onrender.com/
+- **Platform:** Render
+- **Runtime:** Python 3.14
+- **Python Version:** Pinned using `.python-version`
+- **Branch:** `main`
+
+### Build Command
+
+```bash
+pip install -r requirements.txt
 ```
+
+### Start Command
+
+```bash
+uvicorn app.main:app --host 0.0.0.0 --port $PORT
+```
+
+> [!NOTE]
+> The current live deployment uses SQLite and local filesystem storage and is intended for portfolio evaluation, demonstration, and single-instance usage. It should not be treated as a highly available production storage architecture. For multi-user or horizontally scalable production deployments, the application can be migrated to hosted PostgreSQL with cloud object storage.
 
 ---
 
 ## 📊 Core Data Engine & Analytical Methodology
 
 ### Ingestion & Schema Mapping
-- Supports `.csv`, `.xlsx` (via `openpyxl`), and `.xls` (via `xlrd`).
-- **Conservative Synonym Matching**: Resolves column variations (e.g. `order_date`, `transaction_date`, `revenue`, `sales_amount`) without aggressive fuzzy matching.
-- **Ambiguity Rejection**: Conflicting candidate columns trigger an explicit `SchemaAmbiguityError` (HTTP 422) instead of guessing.
+
+The platform supports multiple sales dataset formats:
+
+- CSV
+- XLSX
+- XLS
+
+The ingestion layer validates the uploaded file and converts it into a standardized Pandas DataFrame.
+
+### Conservative Schema Mapping
+
+The schema mapper identifies canonical business fields using known column-name synonyms.
+
+Examples include:
+
+- `order_date`
+- `transaction_date`
+- `date`
+- `revenue`
+- `sales_amount`
+- `unit_price`
+- `selling_price`
+- `quantity`
+- `cost`
+- `profit`
+
+Ambiguous mappings are rejected instead of making unsafe guesses.
 
 ### Data Cleansing & Quality Auditing
-- **Exact Full-Row Deduplication**: Removes duplicate transactions while distinguishing deduplication from invalid record rejection.
-- **No Numerical Value Fabrication**: Missing mandatory dates or revenues (where unit price and quantity cannot compute them) are excluded with explicit reasoning, never zero-imputed.
-- **Explicit Categorical Placeholders**: Missing optional string dimensions (category, region, customer) are assigned an explicit `'Unspecified'` label rather than undergoing statistical imputation.
-- **Anomaly Classification**: Negative quantities (returns) and negative revenues are preserved in cleaned data and audited as business anomalies.
-- **Bounded Health Score ($[0.0, 100.0]$)**:
-  $$\text{Health Score} = 100 \times \left(1 - \frac{\text{Penalties}}{\max(\text{Total Raw Rows}, 1)}\right)$$
 
-### Executive KPI Calculations & Graceful Degradation
-- **Financial Metrics**: Total Revenue, Total Cost, Total Profit ($\text{Revenue} - \text{Cost}$), Profit Margin % ($\frac{\text{Profit}}{\text{Revenue}} \times 100$), Average Order Value ($\frac{\text{Revenue}}{\text{Orders}}$).
-- **Graceful Degradation**: If cost data is omitted, Profit and Profit Margin display `"Unavailable: Cost data not provided"`. If customer ID is omitted, Unique Customers displays `"Unavailable: Customer ID not provided"`.
-- **Month-over-Month (MoM) Growth**:
-  $$\text{MoM Growth} = \frac{\text{Revenue}_{\text{Current Month}} - \text{Revenue}_{\text{Prior Month}}}{\text{Revenue}_{\text{Prior Month}}} \times 100$$
-- **Revenue Trend Switching**: Dynamic line charts supporting metric toggling across Revenue, Profit, and Order Volume.
-- **Category & Regional Performance**: Horizontal bar charts displaying absolute revenue and percentage share of total business volume.
-- **Product Performance Rankings**: Segmented tables displaying Top 10 and Lowest 5 products ranked by total revenue.
+The cleaning engine performs deterministic transformations including:
+
+- Date parsing and validation
+- Numeric value coercion
+- Exact full-row duplicate detection
+- Missing-value analysis
+- Revenue validation
+- Revenue derivation
+- Optional categorical handling
+- Business anomaly detection
+- Health-score calculation
+- Transformation changelog generation
+
+### No Numerical Value Fabrication
+
+The platform does not blindly replace missing numerical values with zero or statistical estimates.
+
+Records with missing mandatory information may be excluded when the required analytical value cannot be established.
+
+The exclusion reason is recorded in the data-quality audit.
+
+### Deterministic Revenue Derivation
+
+If `total_revenue` is missing but valid `quantity` and `unit_price` values are available, revenue can be derived.
+
+The calculation is:
+
+$$
+\text{Revenue} =
+\text{Quantity}
+\times
+\text{Unit Price}
+\times
+(1-\text{Discount})
+$$
+
+Discount values are interpreted according to the platform's supported discount representation.
+
+Every derived revenue value is tracked through the data-quality audit.
+
+### Explicit Categorical Placeholders
+
+Missing optional categorical dimensions are represented using:
+
+```text
+Unspecified
+```
+
+rather than being statistically imputed.
+
+### Business Anomaly Detection
+
+The platform identifies business anomalies including:
+
+- Negative quantities
+- Negative revenue
+- Invalid discounts
+- Suspicious unit prices
+- Out-of-range dates
+
+Returns and other valid business anomalies are preserved rather than automatically deleted.
+
+### Health Score
+
+The platform calculates a bounded data-quality health score between:
+
+```text
+0.0 and 100.0
+```
+
+The score reflects the quality of the uploaded dataset based on detected issues and exclusions.
+
+---
+
+## 📈 Executive KPI Calculations
+
+The dashboard calculates:
+
+### Revenue
+
+```text
+Total Revenue = Sum of Total Revenue
+```
+
+### Cost
+
+```text
+Total Cost = Sum of Total Cost
+```
+
+### Profit
+
+```text
+Profit = Revenue - Cost
+```
+
+### Profit Margin
+
+```text
+Profit Margin % = (Profit / Revenue) × 100
+```
+
+### Average Order Value
+
+```text
+AOV = Revenue / Orders
+```
+
+### Units Sold
+
+```text
+Units Sold = Sum of Quantity
+```
+
+### Unique Customers
+
+Unique customer count is calculated when customer IDs are available.
+
+If customer IDs are not provided, the platform displays:
+
+```text
+Unavailable: Customer ID not provided
+```
+
+### Graceful Analytical Degradation
+
+The platform does not fabricate missing financial information.
+
+For example, if cost information is unavailable, profit is displayed as unavailable rather than being incorrectly calculated.
+
+---
+
+## 📉 Interactive Analytics
+
+### Revenue Trend
+
+Monthly chronological revenue aggregation is displayed through an interactive line chart.
+
+The chart can switch between:
+
+- Revenue
+- Profit
+- Orders
+
+### Category Performance
+
+Revenue is aggregated by product category and displayed through a horizontal bar chart.
+
+### Regional Performance
+
+Revenue is aggregated by region and displayed through a horizontal bar chart.
+
+### Product Performance
+
+Products are ranked by revenue.
+
+The dashboard supports:
+
+- Top Revenue
+- Lowest Revenue
+
+### Multi-Dimensional Filtering
+
+Analytics can be filtered using:
+
+- Start date
+- End date
+- Category
+- Region
+
+Filters can be applied individually or together.
+
+For example:
+
+```text
+Category = Electronics
+Region = North
+```
+
+will return analytics for only that business segment.
+
+---
+
+## 🗂️ Dataset Management
+
+### Dataset Upload
+
+Users can upload:
+
+- CSV
+- XLSX
+- XLS
+
+Each upload passes through the ingestion, schema mapping, cleaning, quality audit, and database persistence pipeline.
+
+### Dataset Quality Review
+
+After processing, the platform provides:
+
+- Overall health score
+- Total raw rows
+- Valid cleaned rows
+- Excluded rows
+- Exact duplicates
+- Invalid dates
+- Invalid numerics
+- Derived values
+- Detected anomalies
+
+### Dataset Deletion
+
+Datasets can be removed through the dashboard.
+
+The deletion flow includes a confirmation modal with:
+
+- Cancel
+- Delete
+
+The deletion process cleans up the associated database records and uploaded file.
+
+### Cleaned Dataset Export
+
+Users can export the processed dataset as a standardized CSV file.
 
 ---
 
 ## 📡 REST API Reference
 
+The platform currently exposes 13 REST API endpoints covering health checks, dataset ingestion and management, data-quality auditing, analytics, filtering, and cleaned-data export.
+
 | Method | Endpoint | Description |
 | :--- | :--- | :--- |
-| `GET` | `/api/v1/health` | Service health status and database connectivity check. |
-| `POST` | `/api/v1/upload` | Upload and process CSV/XLSX/XLS dataset with automated cleansing. |
-| `GET` | `/api/v1/datasets` | List all uploaded datasets with record counts and health scores. |
-| `GET` | `/api/v1/datasets/{id}` | Retrieve dataset metadata and available dimension flags. |
-| `DELETE` | `/api/v1/datasets/{id}` | Delete a dataset, its sales records, and its quality logs. |
-| `GET` | `/api/v1/datasets/{id}/quality-audit` | Detailed data quality audit report (missing fields, anomalies, changelog). |
-| `GET` | `/api/v1/analytics/{id}/kpis` | Executive financial and volume KPIs with MoM growth rates. |
-| `GET` | `/api/v1/analytics/{id}/trends` | Chronological monthly aggregated sales and profit trends. |
-| `GET` | `/api/v1/analytics/{id}/categories` | Revenue breakdown and percentage share by product category. |
-| `GET` | `/api/v1/analytics/{id}/regions` | Revenue breakdown and percentage share by sales region. |
-| `GET` | `/api/v1/analytics/{id}/products` | Product performance rankings (Top Revenue and Lowest Revenue). |
-| `GET` | `/api/v1/analytics/{id}/filter-options` | Available filter options (unique categories, regions, date bounds). |
-| `GET` | `/api/v1/export/{id}/cleaned` | Stream download cleaned dataset as standard CSV format. |
+| `GET` | `/api/v1/health` | Service health status and database connectivity check |
+| `POST` | `/api/v1/upload` | Upload and process CSV/XLSX/XLS datasets |
+| `GET` | `/api/v1/datasets` | List uploaded datasets |
+| `GET` | `/api/v1/datasets/{id}` | Retrieve dataset metadata |
+| `DELETE` | `/api/v1/datasets/{id}` | Delete a dataset and associated records/files |
+| `GET` | `/api/v1/datasets/{id}/quality-audit` | Retrieve detailed data-quality audit |
+| `GET` | `/api/v1/analytics/{id}/kpis` | Retrieve executive KPIs |
+| `GET` | `/api/v1/analytics/{id}/trends` | Retrieve monthly revenue/profit/order trends |
+| `GET` | `/api/v1/analytics/{id}/categories` | Retrieve category performance |
+| `GET` | `/api/v1/analytics/{id}/regions` | Retrieve regional performance |
+| `GET` | `/api/v1/analytics/{id}/products` | Retrieve product performance rankings |
+| `GET` | `/api/v1/analytics/{id}/filter-options` | Retrieve available filter options |
+| `GET` | `/api/v1/export/{id}/cleaned` | Export cleaned dataset as CSV |
 
 ---
 
 ## 🧪 Testing Strategy & Verification
 
-The platform includes **66 comprehensive automated tests** across 7 test suites:
-- **`test_api.py`**: Integration testing of all 12 API endpoints, error responses (404, 413, 422), and SPA asset serving.
-- **`test_cleaner.py`**: Numeric coercion, date parsing, duplicate row accounting, and health score bounds.
-- **`test_ingestion.py`**: Extension validation, file size limits, safe filepath generation, and multi-format parsing.
-- **`test_kpi_engine.py`**: Financial aggregations, graceful degradation when dimensions are absent, and empty data handling.
-- **`test_pipeline_fixtures.py`**: 17 edge-case fixtures covering missing dates, ambiguous schemas, discount types, and return anomalies.
-- **`test_schema_mapper.py`**: Canonical mappings, synonyms, and conflicting column ambiguity detection.
-- **`test_health.py`**: Database connectivity and model relation initialization.
+The project contains **70 automated tests** across 7 test suites.
+
+### `test_api.py` — 21 tests
+
+Tests REST API behavior including:
+
+- Dataset upload
+- Dataset listing
+- Dataset retrieval
+- Dataset deletion
+- KPI endpoints
+- Filtering
+- Export
+- Error handling
+- SPA serving
+
+### `test_cleaner.py` — 11 tests
+
+Tests:
+
+- Numeric coercion
+- Date parsing
+- Duplicate detection
+- Revenue derivation
+- Discount handling
+- Returns
+- Negative anomalies
+- Optional categorical fields
+- Health-score boundaries
+
+### `test_health.py` — 2 tests
+
+Tests:
+
+- API health
+- Database/model initialization
+
+### `test_ingestion.py` — 9 tests
+
+Tests:
+
+- File validation
+- File-size enforcement
+- Filename handling
+- CSV ingestion
+- XLSX ingestion
+- XLS ingestion
+
+### `test_kpi_engine.py` — 3 tests
+
+Tests:
+
+- Financial aggregations
+- Graceful degradation
+- Empty datasets
+
+### `test_pipeline_fixtures.py` — 17 tests
+
+End-to-end edge-case tests covering:
+
+- Missing dates
+- Ambiguous schemas
+- Discounts
+- Returns
+- Suspicious values
+- Missing dimensions
+- Revenue derivation
+
+### `test_schema_mapper.py` — 7 tests
+
+Tests:
+
+- Canonical mappings
+- Column synonyms
+- Quantity/unit-price fallback
+- Ambiguous column detection
+
+### Run the Test Suite
+
+```bash
+python -m pytest -q
+```
+
+Expected result:
+
+```text
+70 passed
+```
+
+### Physical Database Verification
+
+The project also includes:
+
+```bash
+python tests/verify_real_db.py
+```
+
+This verifies the physical SQLite database and tests persistence against:
+
+```text
+sales_analytics.db
+```
 
 ---
 
 ## 💡 Demo Dataset
 
-The platform includes a built-in demo dataset at [`data/demo/demo_sales.csv`](file:///e:/projects/sales-analytics-platform/data/demo/demo_sales.csv) containing 40 multi-category, multi-region transactions spanning 6 months.
+The repository includes a representative demo dataset:
 
-Recruiters and evaluators can explore full platform functionality instantly via the **"Try Demo Dataset"** button on the upload page, which runs the file through the live data processing pipeline.
+[`data/demo/demo_sales.csv`](data/demo/demo_sales.csv)
+
+The demo dataset contains multi-category and multi-region sales records suitable for demonstrating:
+
+- Data ingestion
+- Data-quality auditing
+- KPI calculations
+- Category analysis
+- Regional analysis
+- Product rankings
+- Filtering
+- Export
+
+Users can also load the demo dataset directly from the application's upload interface.
+
+---
+
+## 🗄️ Database
+
+The current application uses:
+
+```text
+SQLite
+```
+
+with:
+
+```text
+SQLAlchemy 2.0
+```
+
+and:
+
+```text
+Alembic
+```
+
+The baseline database schema is maintained through the Alembic migration:
+
+```text
+alembic/versions/0001_initial_schema.py
+```
+
+The database contains tables for:
+
+- Datasets
+- Sales records
+- Data-quality logs
+- KPI cache
+- Alembic migration tracking
+
+SQLite is appropriate for the current portfolio/demo deployment and single-instance architecture.
+
+---
+
+## 🔐 Configuration & Security
+
+Runtime configuration is handled through environment variables using Pydantic Settings.
+
+The repository provides:
+
+```text
+.env.example
+```
+
+Sensitive local configuration is excluded from Git using:
+
+```text
+.gitignore
+```
+
+The following runtime artifacts are intentionally ignored:
+
+```text
+.env
+*.db
+*.sqlite
+*.sqlite3
+uploads/
+.venv/
+```
+
+This prevents local environment secrets, databases, uploaded files, and virtual environments from being committed to the repository.
 
 ---
 
 ## 🔮 Known Limitations & Future Scope
 
-### Current Scope & Limitations
-- Single-node in-process analytical execution via Pandas (optimized for sales spreadsheets up to 50MB).
-- Deterministic heuristic data cleansing without machine learning imputation.
+### Current Implementation
+
+The current platform intentionally uses:
+
+- SQLite
+- Local filesystem storage
+- Single-instance deployment
+- Deterministic rule-based data cleaning
+- Synchronous analytical processing
+
+The current implementation is designed for portfolio evaluation, demonstrations, and small-to-medium sales datasets.
 
 ### Future Scope
-- Automated Narrative Executive Summary generator summarizing key trends from computed KPIs.
-- Multi-user authentication, dataset sharing permissions, and role-based access control.
-- Scheduled recurring automated imports from cloud storage (AWS S3, Google Cloud Storage).
-- Advanced forecasting models (ARIMA / Prophet) for projected revenue trajectories.
+
+#### Production Database
+
+Migration to hosted PostgreSQL for:
+
+- Multi-user workloads
+- Higher concurrency
+- Horizontal scalability
+- Production-grade persistence
+
+#### Cloud Object Storage
+
+Integration with:
+
+- AWS S3
+- Google Cloud Storage
+
+for scalable uploaded-file storage.
+
+#### Authentication & Authorization
+
+Future implementation could include:
+
+- User authentication
+- Role-based access control
+- Dataset ownership
+- Dataset sharing permissions
+
+#### Automated Narrative Summaries
+
+The platform could later generate natural-language summaries explaining:
+
+- Revenue changes
+- Profitability
+- Top-performing products
+- Regional performance
+- Detected anomalies
+
+#### Forecasting
+
+Future analytical extensions could include:
+
+- ARIMA
+- Prophet
+- Other time-series forecasting models
+
+for projected:
+
+- Revenue
+- Sales volume
+- Product demand
+
+#### Advanced Machine Learning
+
+Potential future improvements include machine-learning-assisted anomaly detection and more advanced analytical modeling.
+
+---
+
+## 👨‍💻 Author
+
+**Yash Masurkar**
+
+B.Sc. Computer Science
+
+GitHub: https://github.com/YashMasurkar
+
+---
+
+## 📄 License
+
+This project is developed as an academic and portfolio project for demonstrating practical skills in:
+
+- Data Analytics
+- Data Engineering
+- Python
+- FastAPI
+- Pandas
+- SQLAlchemy
+- Database Design
+- REST API Development
+- Data Visualization
+- Full-Stack Application Development
